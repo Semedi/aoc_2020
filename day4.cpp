@@ -42,12 +42,12 @@ int main ()
     ifstream file("input/day4.txt");
     string input = "";
 
+    // read input
     while (getline(file, str)) {
         input+=str;
         if (str == "")
         {
-            string p = input;
-            passports.push_back(get_passport(p));
+            passports.push_back(get_passport(input));
             input = "";
         }
         else 
@@ -55,20 +55,59 @@ int main ()
             input+=" ";
         }
     }
+    passports.push_back(get_passport(input));
 
+    // part 1
     int count = 0;
     for (const auto& passport: passports){
-        
-        count += (passport.size() == 8) || (passport.size() == 7 && passport.find("cid") == passport.end());
-        std::for_each(passport.begin(), passport.end() , [](pair<string, string > p){
-            cout << p.first << "->" << p.second << " ";
-        });
-        cout << "size: " << passport.size() << " count:" << count;
-        cout << endl;
+        count += (passport.size() == 8);
+        count += (passport.size() == 7 && passport.find("cid") == passport.end());
     }
 
-    cout << "valid passports: " << count << endl;
+    cout << "part 1 valid passports: " << count << endl;
 
-    return 0;
+    // part 2
+    count = 0;
+    for (auto& passport: passports){
+        if (!((passport.size() == 8) ||
+            (passport.size() == 7 && passport.find("cid") == passport.end())))
+            continue;
+
+        bool byr = stoi(passport["byr"]) >= 1920 && stoi(passport["byr"]) <= 2002;
+        bool iyr = stoi(passport["iyr"]) >= 2010 && stoi(passport["iyr"]) <= 2020;
+        bool eyr = stoi(passport["eyr"]) >= 2020 && stoi(passport["eyr"]) <= 2030;
+
+        if (!(byr && iyr && eyr))
+            continue;
+
+        string hgt = passport["hgt"];
+        string cmin = hgt.substr(hgt.length()-2);
+
+        if (!(cmin == "cm" || cmin == "in"))
+            continue;
+
+        int h = stoi(hgt.substr(0, hgt.length()-2));
+
+        if (!((cmin == "cm" && h >= 150 && h <= 193) || 
+                    (cmin == "in" && h >= 59 && h <= 76)))
+            continue;
+
+        regex hair_rgx("#[a-f0-9]{6}$");
+        if (!regex_match(passport["hcl"], hair_rgx))
+            continue;
+
+        regex eye_rgx("amb|blu|brn|gry|grn|hzl|oth");
+        if (!regex_match(passport["ecl"], eye_rgx))
+            continue;
+
+        regex pid_rgx("[0-9]{9}");
+        if (!regex_match(passport["pid"], pid_rgx))
+            continue;
+
+        count++;
+}
+cout << "part 2 valid passports: " << count << endl;
+
+return 0;
 }
 
