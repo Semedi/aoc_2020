@@ -9,7 +9,7 @@ int main ()
     std::ifstream file("input/day7.txt");
 
     //regex rgx("([a-z]+ [a-z]+) bags  contain \\d [a-z]+ [a-z]+ bags?[.|,]");
-    regex rgx("([a-z]+ [a-z]+) bags.*");
+    regex rgx("^([a-z]+ [a-z]+) bags contain((?: \\d [a-z]+ [a-z]+ bags?,?)*)\\.$");
     while (std::getline(file, str)) {
         cout << str << endl;
 
@@ -17,6 +17,7 @@ int main ()
         if (regex_search(str, matches, rgx)) {
 
             cout << "entro" << endl; 
+            cout << matches[0].str() << endl; 
 
         }
         else {
