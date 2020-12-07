@@ -19,10 +19,11 @@ case $key in
 esac
 done
 
-g++ -Wall -g $args -o $EXECUTABLE
 
 if [ "$DEBUG" = true ] ; then
+  g++ -fno-inline-functions -Wall -g $args -o $EXECUTABLE
   gdb $EXECUTABLE
 else
+  g++ $args -o $EXECUTABLE
   $EXECUTABLE
 fi
