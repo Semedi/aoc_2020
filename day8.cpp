@@ -21,6 +21,7 @@ struct tprogram {
     void run();
     void reset();
     void fix();
+    void output();
 };
 
 struct instruction {
@@ -54,26 +55,34 @@ struct instruction {
     }
 };
 
-// part 1;
-void tprogram::run(){
+void tprogram::output()
+{
+    cout << "Program finished!" << endl;
+    cout << "acc: " << acc << endl;
+}
+
+// part 1:
+void tprogram::run()
+{
     while (PC < instructions.size()){
         if (instructions[PC]->counter == 1)
             goto EXCEPTION;
 
         instructions[PC]->execute();
     }
-
-    cout << "Program finished!" << endl;
-    cout << "acc: " << acc << endl;
+    output();
 
     return;
 EXCEPTION:
     cout << "infinite loop exception raised!:" << endl;
     cout << "next instruction: ";
     cout << instructions[PC]->op << " " << instructions[PC]->arg << endl;
+    cout << "acc: " << acc << endl;
 }
 
-void tprogram::reset(){
+// part 2
+void tprogram::reset()
+{
     PC   = 0;
     acc  = 0;
 
@@ -93,7 +102,8 @@ void tprogram::reset(){
     }
 }
 
-void tprogram::fix(){
+void tprogram::fix()
+{
     while (PC < instructions.size()){
         if (instructions[PC]->counter == 1)
             goto RESET;
@@ -101,9 +111,7 @@ void tprogram::fix(){
         instructions[PC]->execute();
     }
 
-    cout << "Program finished!" << endl;
-    cout << "acc: " << acc << endl;
-    cout << "PC: " << PC << endl;
+    output();
 
     return;
 RESET:
