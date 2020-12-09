@@ -10,13 +10,17 @@ struct instruction;
 struct tprogram {
     int PC;
     int acc;
+    int prev;
     vector<shared_ptr<instruction>> instructions;
 
     tprogram(): 
         PC(0),
+        prev(-1),
         acc(0){}
 
     void run();
+    void reset();
+    void fix();
 };
 
 struct instruction {
@@ -44,6 +48,10 @@ struct instruction {
         }
         counter++;
     }
+
+    void swap(){
+        op = op == "nop" ? "jmp" : "nop";
+    }
 };
 
 // part 1;
@@ -63,7 +71,56 @@ EXCEPTION:
     cout << "infinite loop exception raised!:" << endl;
     cout << "next instruction: ";
     cout << instructions[PC]->op << " " << instructions[PC]->arg << endl;
+}
+
+void tprogram::reset(){
+    PC   = 0;
+    acc  = 0;
+
+    if (prev != -1)
+        instructions[prev]->swap();
+
+    auto set = true;
+    for (int i = 0; i < instructions.size(); i++){
+        instructions[i]->counter = 0;
+        if (prev < i && set){
+            if (instructions[i]->op == "jmp" || instructions[i]->op == "nop"){
+                instructions[i]->swap();
+                prev = i;
+                set = false;
+            }
+        }
+    }
+}
+
+void tprogram::fix(){
+    while (PC < instructions.size()){
+        if (instructions[PC]->counter == 1)
+            goto RESET;
+
+        instructions[PC]->execute();
+    }
+
+    cout << "Program finished!" << endl;
     cout << "acc: " << acc << endl;
+    cout << "PC: " << PC << endl;
+
+    return;
+RESET:
+    cout << "-----------------------------------------------" << endl;
+    cout << "infinite loop exception raised!:" << endl;
+    cout << "    next instruction: ";
+    cout << instructions[PC]->op << " " << instructions[PC]->arg << endl;
+
+    cout << "    prev instruction: ";
+    cout << instructions[prev]->op << " " << instructions[prev]->arg << endl;
+    cout << "    acc:  " << acc << endl;
+    cout << "The system is going to reset..." << endl;
+    cout << endl;
+
+    reset();
+    fix();
+
 }
 
 int main ()
@@ -92,7 +149,8 @@ int main ()
     }
 
     program->instructions = move(ins);
-    program->run();
+    //program->run();
+    program->fix();
 
     return 0;
 }
