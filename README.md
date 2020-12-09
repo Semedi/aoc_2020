@@ -7,3 +7,10 @@ execute it script style:
 ```
 ./e day<numper>.cpp
 ```
+
+debugging (neeed gdb):
+execute it script style:
+```
+./e day<numper>.cpp -d
+```
+
